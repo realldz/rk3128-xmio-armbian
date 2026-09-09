@@ -1,0 +1,24 @@
+# Heavy local-only trees (too big / third-party for a git repo)
+/work/
+/repos/linux-kernel-6.6-rk3128-tvbox/
+/stock-firmware/
+/A26-release-*/
+
+# Cross toolchain tarball (~99 MB) - download link in docs/BUILD.md
+/tools/toolchain/
+
+# Superseded historical builds (kept locally only)
+/output/archive/
+
+# Large images - distributed as GitHub Release assets instead
+/output/*.img
+/output/*.tar.gz
+/output/planb-stock-uboot/update_*.img
+
+# Python
+__pycache__/
+*.pyc
+
+# OS junk
+Thumbs.db
+desktop.ini

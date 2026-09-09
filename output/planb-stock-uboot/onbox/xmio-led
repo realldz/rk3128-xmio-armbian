@@ -1,0 +1,102 @@
+#!/bin/sh
+# xmio-led v19.6 — zero-fork steady state (~0.1-0.3% CPU, was 1-3%)
+#   starts at basic.target -> RED BLINK through boot until multi-user
+#   reached AND network decided; then solid per connectivity.
+#   dual rg @ gpio0_B0: brightness 1 = RED, 0 = GREEN
+#   yellow    @ gpio1_B1: 1 = IO (kernel ACTIVE_LOW)
+S=/sys/class/leds/xmio:red-green:status
+Y=/sys/class/leds/xmio:yellow:io
+[ -d "$S" ] && [ -d "$Y" ] || { echo "xmio-led: LED nodes missing"; exit 1; }
+echo none > "$S/trigger" 2>/dev/null
+
+LOG=/tmp/xmio-led.log
+logm() {
+  read UP _x < /proc/uptime
+  echo "up=$UP NETOK=$NETOK BOOT=$BOOT tick=$TICK $1" >> "$LOG"
+}
+
+# zero-fork diskstats reader: RD/WR = sectors read/written of rknand_root
+snap() {
+  RD=""; WR=""
+  while read -r _a _b _nm _r _rm _rs _rt _w _wm _ws _rest; do
+    if [ "$_nm" = "rknand_root" ]; then RD=$_rs; WR=$_ws; return; fi
+  done < /proc/diskstats
+}
+
+PING=$(command -v ping 2>/dev/null)
+IPCMD=$(command -v ip 2>/dev/null)
+PRD=""; PWR=""
+NETOK=""      # ""=undecided, 1=connected, 0=not
+BOOT=""       # ""=booting, 1=multi-user reached
+TICK=0; BLINK=0
+
+# zero-fork link check: read builtin instead of cat
+link_up() {
+  for f in /sys/class/net/*; do
+    case "$f" in */lo|*/sit0|*/virbr*|*/tun*) continue ;; esac
+    c=""; o=""
+    read c < "$f/carrier" 2>/dev/null
+    read o < "$f/operstate" 2>/dev/null
+    [ "$c" = "1" ] && return 0
+    [ "$o" = "up" ] && return 0
+  done
+  return 1
+}
+
+# full re-eval: 3 forks (ip, awk, ping) every NET_EVERY ticks
+net_full() {
+  if [ -n "$IPCMD" ]; then
+    A=$(ip -4 -o addr show scope global 2>/dev/null)
+    [ -n "$A" ] || { NETOK=0; return; }
+    if [ -n "$PING" ]; then
+      GW=$(ip route 2>/dev/null | awk '/^default/{print $3; exit}')
+      if [ -n "$GW" ]; then
+        "$PING" -c1 -W1 "$GW" >/dev/null 2>&1 && NETOK=1 || NETOK=0
+      else
+        NETOK=1
+      fi
+    else
+      NETOK=1
+    fi
+  else
+    AW=$(awk '$2=="00000000"{print $1; exit}' /proc/net/route 2>/dev/null)
+    [ -n "$AW" ] && NETOK=1 || NETOK=0
+  fi
+}
+
+logm "service-start"
+while :; do
+  # multi-user check: only until first success, then never again
+  if [ "$BOOT" != "1" ] && [ $((TICK % 4)) -eq 0 ]; then
+    systemctl is-active multi-user.target >/dev/null 2>&1 && BOOT=1
+  fi
+
+  if link_up; then
+    if [ $((TICK % 20)) -eq 0 ]; then net_full; fi
+  else
+    NETOK=0
+  fi
+
+  if [ "$BOOT" != "1" ] || [ -z "$NETOK" ]; then
+    BLINK=$((1 - BLINK))
+    echo "$BLINK" > "$S/brightness"
+  elif [ "$NETOK" = "1" ]; then
+    echo 0 > "$S/brightness"     # green
+  else
+    echo 1 > "$S/brightness"     # red
+  fi
+  TICK=$((TICK+1))
+
+  if [ $((TICK % 600)) -eq 0 ]; then logm "tick"; fi
+
+  snap
+  if [ -n "$RD" ]; then
+    if [ "$RD" != "$PRD" ] || [ "$WR" != "$PWR" ]; then echo 1 > "$Y/brightness"
+    else echo 0 > "$Y/brightness"; fi
+    PRD="$RD"; PWR="$WR"
+  else
+    echo 0 > "$Y/brightness"
+  fi
+
+  sleep 0.5
+done

@@ -1,0 +1,13 @@
+[Unit]
+Description=XMIO status LEDs (boot blink + net state + disk IO)
+After=local-fs.target systemd-udevd.service armbian-led-state.service
+Conflicts=shutdown.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/xmio-led
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=basic.target

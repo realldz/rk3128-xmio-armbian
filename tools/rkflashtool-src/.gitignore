@@ -1,0 +1,9 @@
+rkflashtool
+rkcrc
+rkunpack
+*.zip
+*.tar.bz2
+*.tar.gz
+*.tar.xz
+*~
+*.swp

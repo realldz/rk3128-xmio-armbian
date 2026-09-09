@@ -1,0 +1,112 @@
+RK Protocol
+
+
+request
+=======
+
+[00]    55 53 42 43     U S B C
+[04]    01 02 03 04     random value, echoed by device in response
+[08]    00 00 00 00     reserved
+
+[12]    80              flag
+[13]    00              reserved
+[14]    06              foo
+[15]    01              command
+[16]    00              bar
+
+[17]    01 02 03 04     address, in sectors, big endian
+
+[21]    00 
+
+[22]    01 02           number of sectors (512 bytes/sector), big endian
+                        or number of bytes (e.g. ReadSDRAM)
+
+[24]    00 00           used during ExecuteSDRAM
+
+[26]    00              reserved
+[27]    00 00 00 00     reserved
+
+31 bytes
+
+notes:
+
+[17-20] and [22-25] seem to form a full 64-bit address to jump to
+
+[16-19] four fuses during WriteEfuse
+[20-23] zero or next four fuses
+
+
+response
+========
+
+[00]    55 53 42 53     U S B S
+[04]    01 02 03 04     random
+[08]    00 00 00        unknown
+[11]    06              unknown, sometimes 6, sometimes 0
+[12]    01              error_flag, 0 = OK, 1 = ERROR
+
+13 bytes
+
+notes:
+
+[08-11] are two 16-bit big endian words with an error code if error_flag == 1
+
+
+
+12      14      15
+flag    foo     cmd
+-------+-------+-------
+0x80    0x06    0x00    TestUnitReady             0
+0x80    0x06    0x01    ReadFlashID               5 bytes
+0x80    0x06    0x1a    ReadFlashInfo           11|512 bytes
+0x80    0x06    0x1b    ReadChipInfo             16 bytes
+0x80    0x06    0x20    ReadEfuse                 8 bytes
+
+0x00    0x06    0x02    SetDeviceInfo             0
+0x00    0x06    0x16    EraseSystemDisk           0
+0x00    0x06    0x1e    SetResetFlag              0
+0x00    0x06    0xff    ResetDevice               0
+
+0x80    0x0a    0x03    TestBadBlock             64 bytes
+0x80    0x0a    0x04    ReadSector              512|528 bytes
+0x80    0x0a    0x14    ReadLBA               n*512 bytes
+0x80    0x0a    0x17    ReadSDRAM                 n bytes
+0x80    0x0a    0x21
+
+0x00    0x0a    0x05    WriteSector             512|528 bytes
+0x00    0x0a    0x06    EraseSectors              0
+0x00    0x0a    0x0b
+0x00    0x0a    0x15    WriteLBA              n*512 bytes
+0x00    0x0a    0x18    WriteSDRAM                n bytes
+0x00    0x0a    0x19    ExecuteSDRAM              0
+0x00    0x0a    0x1f    WriteEfuse                0 (fuses are in command pkt)
+0x00    0x0a    0x22
+
+0x80    0x10    0x07    WriteSpare                n bytes
+0x80    0x10    0x08    ReadSpare                 n bytes
+
+0x00    0x00    0x1c    LowerFormat               0
+0x00    0x00    0x30    write 16k to device     16k bytes, resp is 18 bytes
+
+
+
+
+11|512 bytes of FlashInfo [0-511]
+---------------------------------
+
+[0-3]   =       Number of sectors
+[4-5]   =       Page size
+[6]     =
+[7-8]   =
+
+[9]     =       00 - Samsung
+                01 - Toshiba
+                02 - Hynix
+                03 - Infineon
+                04 - Renesas
+                05 - ST
+                06 - Intel
+
+[10]    =
+
+

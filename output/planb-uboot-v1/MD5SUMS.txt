@@ -1,0 +1,5 @@
+00241399ce5190d0da6b03c5613e9e81  build.log
+ccbcaeaa37f3c39ec2f4685d5e4ade83  u-boot-v1.bin
+5dae746f02872371992228f5f9b95d8d  u-boot-v1.dtb
+599aed869ad463bb2358c65bb954b783  uboot-v1.config
+d87d27629ea5ad6fc9c540ab2e0e8e7d  uboot-v1.img

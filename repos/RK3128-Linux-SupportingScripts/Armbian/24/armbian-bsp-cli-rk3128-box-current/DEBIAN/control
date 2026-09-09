@@ -1,0 +1,14 @@
+Package: armbian-bsp-cli-rk3128-box-current
+Version: 26.2.1
+Architecture: armhf
+Maintainer: Armbian Linux <info@armbian.com>
+Section: kernel
+Priority: optional
+Recommends: bsdutils, parted, util-linux, toilet
+Description: Armbian CLI BSP for board 'rk3128-box' branch 'current' 
+Installed-Size: 1496
+Armbian-Original-Hash: 1-PC8f91-V5e5d-He14c-B8122-Rf36a
+Depends: bash, linux-base, u-boot-tools, initramfs-tools, lsb-release, fping, device-tree-compiler, base-files (>= 26.2.1)
+Replaces: zram-config, armbian-bsp-cli-rk3128-box (<< 26.2.1)
+Breaks: armbian-bsp-cli-rk3128-box (<< 26.2.1)
+Provides: armbian-bsp-cli
