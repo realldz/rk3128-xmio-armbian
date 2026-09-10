@@ -1,0 +1,25 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Enable UART2 as a serial console port.
+ *
+ * On RK3128 the UART2 pins are shared with the SDMMC controller, so this
+ * overlay is only useful on boards without an SD slot (or with SD unused).
+ * Many RK3128 TV boxes route their debug pads to UART2 (the stock Android
+ * firmware typically used fiq-debugger on ttyFIQ0 backed by UART2).
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/pinctrl/rockchip.h>
+
+/ {
+	fragment@0 {
+		target = <&uart2>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&uart2_xfer>;
+			status = "okay";
+		};
+	};
+};

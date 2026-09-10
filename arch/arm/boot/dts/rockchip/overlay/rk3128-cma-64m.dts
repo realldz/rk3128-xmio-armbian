@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Increase default CMA to 64 MiB for media/display experiments.
+ *
+ * Keep this opt-in so the base DTB stays suitable for headless/server use.
+ */
+
+/dts-v1/;
+/plugin/;
+
+/ {
+	fragment@0 {
+		target = <&cma_region>;
+		__overlay__ {
+			/delete-property/ reg;
+			size = <0x04000000>;
+			alignment = <0x2000>;
+			linux,cma-default;
+		};
+	};
+};

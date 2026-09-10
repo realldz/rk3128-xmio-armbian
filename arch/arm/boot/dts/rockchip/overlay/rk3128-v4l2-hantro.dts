@@ -1,0 +1,88 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Expose RK3128 VDPU1/VEPU1 through the mainline Hantro V4L2 mem2mem driver.
+ *
+ * This is a test overlay. It disables the vendor MPP service codec nodes that
+ * own the same registers, then adds a Hantro-compatible combined VPU node.
+ *
+ * Pair this with a larger CMA overlay for practical decode/display testing.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/rk3128-cru.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/power/rk3128-power.h>
+
+/ {
+	fragment@0 {
+		target = <&mpp_srv>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@1 {
+		target = <&hevc>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@2 {
+		target = <&hevc_mmu>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@3 {
+		target = <&vepu>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@4 {
+		target = <&vdpu>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@5 {
+		target = <&vpu_mmu>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@6 {
+		target-path = "/";
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			hantro_vpu: video-codec@10106000 {
+				compatible = "rockchip,rk3066-vpu";
+				reg = <0x10106000 0x800>;
+				interrupt-parent = <&gic>;
+				interrupts = <GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH>,
+					     <GIC_SPI 7 IRQ_TYPE_LEVEL_HIGH>;
+				interrupt-names = "vepu", "vdpu";
+				clocks = <&cru ACLK_VDPU>, <&cru HCLK_VDPU>,
+					 <&cru ACLK_VDPU>, <&cru HCLK_VDPU>;
+				clock-names = "aclk_vdpu", "hclk_vdpu",
+					      "aclk_vepu", "hclk_vepu";
+				rockchip,grf = <&grf>;
+				rockchip,grf-offset = <0x0144>;
+				rockchip,grf-value = <0x04000400>;
+				resets = <&cru SRST_VCODEC_H>, <&cru SRST_VCODEC_A>;
+				reset-names = "video_h", "video_a";
+				power-domains = <&power RK3128_PD_VIDEO>;
+				status = "okay";
+			};
+		};
+	};
+};

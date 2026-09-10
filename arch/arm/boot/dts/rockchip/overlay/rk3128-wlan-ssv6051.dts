@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * RK3128 WLAN overlay for boards populated with SSV6051.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/rockchip.h>
+
+/ {
+	fragment@0 {
+		target-path = "/";
+		__overlay__ {
+			wireless-wlan {
+				compatible = "wlan-platdata";
+				rockchip,grf = <&grf>;
+				clocks = <&xin32k>;
+				clock-names = "clk_wifi";
+				ref-clock-frequency = <32768>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&wifi_enable_h_ssv6051>;
+				wifi_chip_type = "ssv6051";
+				wifi_sdio_host = <&sdio>;
+				sdio_vref = <1800>;
+				WIFI,poweren-gpios = <&gpio0 RK_PD6 GPIO_ACTIVE_HIGH>;
+				WIFI,host_wake-gpios = <&gpio0 RK_PA2 GPIO_ACTIVE_HIGH>;
+				status = "okay";
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&pinctrl>;
+		__overlay__ {
+			sdio-pwrseq {
+				wifi_enable_h_ssv6051: wifi-enable-h-ssv6051 {
+					rockchip,pins = <0 RK_PD6 RK_FUNC_GPIO &pcfg_pull_none>;
+				};
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <&sdio>;
+		__overlay__ {
+			rockchip,no-dmaengine;
+			max-frequency = <37500000>;
+			bus-width = <4>;
+			cap-sd-highspeed;
+			cap-sdio-irq;
+			supports-sdio;
+			disable-wp;
+			ignore-pm-notify;
+			keep-power-in-suspend;
+			pinctrl-names = "default";
+			pinctrl-0 = <&sdio_cmd &sdio_clk &sdio_bus4>;
+			non-removable;
+			status = "okay";
+		};
+	};
+};

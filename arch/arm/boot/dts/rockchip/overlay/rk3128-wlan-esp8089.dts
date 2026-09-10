@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * RK3128 WLAN overlay for boards populated with ESP8089.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/rockchip.h>
+
+/ {
+	fragment@0 {
+		target-path = "/";
+		__overlay__ {
+			wireless-wlan {
+				compatible = "wlan-platdata";
+				rockchip,grf = <&grf>;
+				wifi_chip_type = "esp8089";
+				wifi_sdio_host = <&sdio>;
+				sdio_vref = <0>;
+				WIFI,poweren-gpios = <&gpio0 RK_PD6 GPIO_ACTIVE_HIGH>;
+				WIFI,host_wake-gpios = <&gpio0 RK_PA2 GPIO_ACTIVE_HIGH>;
+				status = "okay";
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&sdio>;
+		__overlay__ {
+			rockchip,no-dmaengine;
+			max-frequency = <37500000>;
+			bus-width = <4>;
+			cap-sd-highspeed;
+			cap-sdio-irq;
+			supports-sdio;
+			disable-wp;
+			ignore-pm-notify;
+			keep-power-in-suspend;
+			pinctrl-names = "default";
+			pinctrl-0 = <&sdio_cmd &sdio_clk &sdio_bus4>;
+			non-removable;
+			status = "okay";
+		};
+	};
+};

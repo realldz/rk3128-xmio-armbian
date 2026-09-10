@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * XMIO RK3128 NAND TV box (stock firmware VTIDC_XMIO_20160128_for_nandflash).
+ *
+ * Derived from rk3128-linux.dts with board-specific fixes extracted from the
+ * stock Android 4.4 device tree (resource.img DTB, decompiled):
+ *
+ *  - USB host port 5V (VBUS) is switched by GPIO3_C4, physical HIGH = ON.
+ *    Verified against the vendor 4.4 driver (usbdev_rk3126.c):
+ *    usb20host_hw_init() forces the host_drv_gpio to logical 1 at probe and
+ *    usb20host_power_enable(1) drives it to 1; the raw GPIO value maps
+ *    directly to the physical pin level (the 0x01/ACTIVE_LOW flag in the
+ *    stock DTS is ignored by of_get_named_gpio()/gpio_set_value()).
+ *    The vendor 6.6 kernel has no rk_usb_control node, so drive the rail
+ *    with a GPIO hog (always on) - the host connector always has 5V, just
+ *    like stock Android.
+ *  - USB OTG port 5V is switched by GPIO3_C1, physical HIGH = ON (stock
+ *    init sets it to 0 = OFF, power_enable(1) sets it to 1 = ON). The base
+ *    DTS fixed regulator with enable-active-high on the same pin already
+ *    matches this wiring, so no change is needed here.
+ *  - Onboard Wi-Fi is ESP8089 on the SDIO host with poweren on GPIO0_D6
+ *    (active high) and host wake on GPIO0_A2 - identical wiring to the base
+ *    board's wlan-esp8089 overlay, so that overlay still applies.
+ *  - Internal storage is raw NAND (nandc); keep eMMC/SDMMC disabled as in
+ *    the base DTS.
+ */
+
+#include "rk3128-linux.dts"
+
+/ {
+	model = "XMIO RK3128 TV Box";
+	compatible = "xmio,rk3128-box", "rockchip,rk3128";
+};
+
+/*
+ * Host port VBUS has no regulator binding in this kernel; hog GPIO3_C4 to
+ * physical high so the external USB host connector always has 5V, exactly
+ * like the stock firmware does through usb_control/host_drv_gpio.
+ */
+&gpio3 {
+	vcc-host-vbus-hog {
+		gpio-hog;
+		gpios = <RK_PC4 GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "vcc-host-vbus";
+	};
+};
