@@ -1897,9 +1897,11 @@ specimen, delete when convenient).
 Package the entire firmware into **1 flashable `.img` file via RKDevTool/
 UpgradeTool exactly like stock Android** (`update_(VTIDC_XMIO_20160128_for_nandflash).img`),
 following the Firefly wiki procedure exactly (Customize Firmware): `afptool -pack` →
-`img_maker`. Tools: `work/rk2918_tools/` (mirror of dayongxie/rk2918_tools,
-patched for buffer 4096 + chiptype "A213"), script `tools/build-update-img.sh`,
-verify `tools/rkfw-verify.py`.
+`img_maker`. Tools: the patched `afptool` + `img_maker` built from
+[dayongxie/rk2918_tools](https://github.com/dayongxie/rk2918_tools) with a 4096-byte
+line buffer and chiptype `"A213"` ([RKAF-FORMAT.md](RKAF-FORMAT.md) lists all three
+patches); `tools/build-update-img.sh` expects them in the container at
+`/tmp/rk2918_tools/`. Script `tools/build-update-img.sh`, verify `tools/rkfw-verify.py`.
 
 **File:** `output/planb-stock-uboot/update_armbian_v28-v232.img` —
 1.174.931.928 B (1.12 GiB), md5 `f3223b97b5a867f8fc2fe4249708812c`
