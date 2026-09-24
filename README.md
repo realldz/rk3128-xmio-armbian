@@ -75,7 +75,7 @@ Everything else on the author's machine is a **local-only working copy**
 (gitignored, not published): `work/` (scratch + build logs),
 `repos/linux-kernel-6.6-rk3128-tvbox/` (the kernel checkout),
 `A26-release-20260430/` (upstream A26 build + RKDevTool),
-`stock-firmware/`, `output/archive/` and `tools/toolchain/`.
+`stock-firmware/` and `tools/toolchain/`.
 
 ### Sources
 
@@ -92,8 +92,11 @@ Everything else on the author's machine is a **local-only working copy**
 
 Large files (`update_armbian_v28-v232.img` ~1.1 GB, `armbian_rootfs_v23.2_xmio.img`
 ~1.1 GB, `XMIO-bundle.tar.gz`, and the stock Android firmware
-`update_(VTIDC_XMIO_20160128_for_nandflash).img` ~543 MB) are attached to the
-[GitHub release](../../releases) instead of git.
+`stock-android_VTIDC_XMIO_20160128_for_nandflash.img` ~543 MB) are attached to the
+[GitHub release](../../releases) instead of git. The same release carries
+`xmio-rollback-images-*.tar.gz` — the archived `boot-v24.3 … v28.img`,
+`uboot-planb-mac.img`, `resource*.img` and `parameter.txt*` files used by the
+rollback instructions in [docs/FLASH-GUIDE.md](docs/FLASH-GUIDE.md) §H.
 
 ## Rebuild from scratch
 

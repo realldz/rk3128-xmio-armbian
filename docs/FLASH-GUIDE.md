@@ -126,13 +126,11 @@ not stored in git.
 If the XMIO build won't boot or misbehaves:
 
 1. **Back to the original A26 (keep Linux)**: reflash the `armbian_rootfs_26.2.img`
-   from the upstream A26 release (the author's original, local-only copy:
-   `A26-release-20260430/A26-release-20260430/armbian_rootfs_26.2.img`) to the `root`
-   partition (0x6000) following the Section B procedure exactly.
-   The bootchain is untouched, so it's done in 2 minutes.
+   from the upstream A26 release (the base project — that tree is *not* published in
+   this repository) to the `root` partition (0x6000) following the Section B
+   procedure exactly. The bootchain is untouched, so it's done in 2 minutes.
 2. **Full return to stock Android**: RKDevTool tab **升级固件 (Upgrade Firmware)** →
-   pick the `stock-android_VTIDC_XMIO_20160128_for_nandflash.img` release asset
-   (local-only copy: `stock-firmware/update_(VTIDC_XMIO_20160128_for_nandflash).img`) →
+   pick the `stock-android_VTIDC_XMIO_20160128_for_nandflash.img` release asset →
    EraseFlash + Download. The box goes back to exactly the factory Android (all Armbian gone).
 3. **Root shell over UART**: the serial console is also a login terminal (login: `root`,
    password `1234` the first time — Armbian will ask you to change it). If SSH fails, you can still
@@ -140,6 +138,11 @@ If the XMIO build won't boot or misbehaves:
 4. **U-Boot prompt**: within the first 9-second bootdelay, press any key on UART1 to enter the
    `RK3128 >>` prompt — you can use the XMIO hook (`setenv xmio_fdt_override ...; boot`,
    see Section D), `printenv`, `saveenv`...
+5. **Older kernel/DTB/parameter images**: the `boot-v24.3` … `boot-v28.img`,
+   `uboot-planb-mac.img`, `resource*.img` and `parameter.txt*` files that the
+   rollback lines in sections Z.27–Z.30 refer to ship in the
+   `xmio-rollback-images-*.tar.gz` release asset; `archive/README-ROLLBACK.md`
+   inside it lists the size, md5, SHA-256 and flash address of every file.
 
 ## I. One-page process summary (cheat sheet)
 
@@ -1721,7 +1724,7 @@ bug; the vendor area cannot be reflashed with a partition image.
    the old kernel + self-driven retry** (delayed work 2s + device_attach,
    30s deadline for a genuinely dead vendor) → boot.img
    `f1e3098968637e76a52b297804996590` @0xE000, zImage `e7ff8c59…`;
-   v24.4b backup → `output/archive/boot-v24.4b.img`.
+   v24.4b backup → `archive/boot-v24.4b.img` (release asset, see §H).
 2. rootfs **v23.2** (`657da568d2a31ae1676eda78a63091b9` @0x17000,
    clean build from v23 — does NOT use debugfs write to overwrite an existing
    file, the "Ext2 file already exists" error): `vendor-mac` static ARM + mode
@@ -1749,7 +1752,7 @@ then `vendor-mac: IF: xx → b8:3d:4e:84:3d:a3 (live)`; dmesg shows
 if the vendor revives → boot shows `rknand vendor storage init ok !`
 + eth0 with the correct label MAC right from the kernel.
 
-Rollback: boot v24.3 (`output/archive/boot-v24.3.img`), rootfs v23
+Rollback: boot v24.3 (`archive/boot-v24.3.img`, release asset — see §H), rootfs v23
 (`3a9abd13…`).
 
 ## Z.28 — v24.4c-era black HDMI + force-mode cmdline fix (finalized 09/09)
@@ -1863,7 +1866,7 @@ every content update lags at most 1 frame (shadow → scanout). If
 STILL torn under heavy motion → suspect DDR bandwidth → try 720p
 (`parameter.txt.force720` @0x0, md5 see NOTES §94) to triage.
 
-Rollback: boot v27 (`archive/boot-v27.img` `8abbb3cb…`) @0xE000.
+Rollback: boot v27 (`archive/boot-v27.img` `8abbb3cb…`, release asset — see §H) @0xE000.
 
 ---
 
