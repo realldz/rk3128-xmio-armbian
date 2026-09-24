@@ -10,6 +10,7 @@
 *.o.*
 *.a
 *.s
+!*.S
 *.su
 *.mod.c
 *.i
@@ -87,3 +88,14 @@ GTAGS
 *.orig
 *~
 \#*#
+#
+# NOTE (XMIO fork): the rules above also hide files that upstream tracks.
+# '*.s' matched the hand-written '*.S' assembly sources on case-insensitive
+# filesystems (Windows/macOS, core.ignorecase=true), which left this vendored
+# tree incomplete and unbuildable; the rest are upstream test fixtures/config.
+#
+!*.S
+!/.checkpatch.conf
+!/.travis.yml
+!/tools/binman/test/descriptor.bin
+!/tools/patman/test/*.patch

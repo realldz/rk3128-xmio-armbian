@@ -29,7 +29,10 @@ If you see logs → capture them and post them into the conversation so I can an
 
 ## B. Flashing NAND via RKDevTool (preferred)
 
-Use **RKDevTool v2.69**, which ships with the A26 build (already in `A26-release-20260430/`).
+Use **RKDevTool v2.69**, which ships with the upstream A26 release. Note that
+`A26-release-20260430/` is a *local-only* working copy on the author's machine
+(gitignored, not part of this repository) — download the A26 release yourself if
+you need RKDevTool or the original A26 rootfs.
 
 Files you need (in `output/nand-flash/`):
 | File | Purpose |
@@ -113,18 +116,24 @@ setenv xmio_overrides "usb-otg-host uart1 dmc-disabled"; boot   # force a differ
 
 `output/SHA256SUMS.txt` holds the checksums of every deliverable. On Windows:
 `Get-FileHash -Algorithm SHA256 <file>` to compare (the `nand-flash/*` files must be
-byte-identical to the original A26 — verified at build time).
+byte-identical to the original A26 — verified at build time). The two release-asset
+lines (`armbian_rootfs_v23.2_xmio.img`, `planb-stock-uboot/update_armbian_v28-v232.img`)
+only verify once you have downloaded those files from the GitHub release — they are
+not stored in git.
 
 ## H. Recovery / rollback (the safe way back)
 
 If the XMIO build won't boot or misbehaves:
 
-1. **Back to the original A26 (keep Linux)**: reflash the `A26-release-20260430/.../armbian_rootfs_26.2.img`
-   file (the author's original) to the `root` partition (0x6000) following the Section B procedure exactly.
+1. **Back to the original A26 (keep Linux)**: reflash the `armbian_rootfs_26.2.img`
+   from the upstream A26 release (the author's original, local-only copy:
+   `A26-release-20260430/A26-release-20260430/armbian_rootfs_26.2.img`) to the `root`
+   partition (0x6000) following the Section B procedure exactly.
    The bootchain is untouched, so it's done in 2 minutes.
 2. **Full return to stock Android**: RKDevTool tab **升级固件 (Upgrade Firmware)** →
-   pick the `stock-firmware/update_(VTIDC_XMIO_20160128_for_nandflash).img` file → EraseFlash +
-   Download. The box goes back to exactly the factory Android (all Armbian gone).
+   pick the `stock-android_VTIDC_XMIO_20160128_for_nandflash.img` release asset
+   (local-only copy: `stock-firmware/update_(VTIDC_XMIO_20160128_for_nandflash).img`) →
+   EraseFlash + Download. The box goes back to exactly the factory Android (all Armbian gone).
 3. **Root shell over UART**: the serial console is also a login terminal (login: `root`,
    password `1234` the first time — Armbian will ask you to change it). If SSH fails, you can still
    control the box over UART.

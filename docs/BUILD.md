@@ -24,13 +24,28 @@ toolchain) on a Windows host. This document describes the full pipeline: toolcha
   Windows drive via `\\wsl$`).
 
   Upstream for reference: `chieunhatnang-personal/linux-kernel-6.6-rk3128-tvbox`.
+
+  > **Careful with `git fetch`:** `origin` fetches all branches
+  > (`+refs/heads/*`), so a bare `git fetch` also downloads the ~1.1 GB
+  > `kernel-source` branch. Use `git fetch origin master` when you only want the
+  > build scripts.
 - `repos/u-boot-rk3128-tvbox/` (U-Boot 2017.09 BSP @ `218938c`) and
   `repos/RK3128-Linux-SupportingScripts/` (@ `da323ac`) are **vendored
   directly in this repo** — no clone needed.
+- The upstream **A26 release tree** (`A26-release-20260430/`) is *not* in this
+  repository. `rebuild-all.sh` only used it to refresh the stock
+  loader/`parameter.txt` files, which are already committed under
+  `output/nand-flash/`; without the A26 tree the script warns and keeps those
+  committed copies.
+- `work/` (scratch: build logs, `kernel-src.tar.gz`) is gitignored and absent in
+  a fresh clone — `rebuild-all.sh` and `acceptance.sh` create it themselves.
 
 - Cross toolchain `gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf`
-  — download from ARM and place it as `tools/toolchain/gcc-arm-10.3.tar.xz`
-  (the tarball is not stored in git; ~99 MB).
+  — from Arm's **GNU Toolchain** downloads (`developer.arm.com` → Downloads;
+  the ARM-hosted mirrors now require a GitHub sign-in). Save the tarball as
+  `tools/toolchain/gcc-arm-10.3.tar.xz` — it is not stored in git (~99 MB), and
+  `rebuild-all.sh` refuses to start without it. The expected top-level directory
+  after extraction is `gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf/`.
 
 ## 1. Build image
 

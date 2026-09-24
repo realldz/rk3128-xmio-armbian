@@ -3,6 +3,7 @@
 # Run after ANY rebuild: docker run --rm --privileged -v "${PWD}:/workspace" \
 #   rk3128-build bash /workspace/tools/acceptance.sh
 # Exit code 0 = all green. Log: /workspace/work/acceptance.log
+mkdir -p /workspace/work   # gitignored scratch dir; absent in a fresh clone
 exec > /workspace/work/acceptance.log 2>&1
 FAIL=0
 ok()  { echo "PASS: $1"; }

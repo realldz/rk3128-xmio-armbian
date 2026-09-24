@@ -1,0 +1,26 @@
+# Line-ending policy.
+#
+# Only this project's own scripts are normalised; the vendored upstream trees
+# (repos/u-boot-rk3128-tvbox, repos/RK3128-Linux-SupportingScripts) are kept
+# byte-for-byte as imported, so no pattern here may match paths under repos/.
+#
+# The build pipeline runs inside the Debian container ("bash /workspace/tools/x.sh"),
+# where a stray CR makes the shebang/arguments fail in confusing ways.
+
+/tools/*.sh     text eol=lf
+/tools/*/*.sh   text eol=lf
+/tools/*.py     text eol=lf
+/tools/*/*.py   text eol=lf
+
+# PowerShell helpers are used from Windows only.
+/tools/*.ps1    text eol=crlf
+
+# Binary artifacts must never be normalised.
+*.img   binary
+*.bin   binary
+*.deb   binary
+*.dtb   binary
+*.dtbo  binary
+*.gz    binary
+*.xz    binary
+*.scr   binary

@@ -10,6 +10,20 @@ A26=/workspace/A26-release-20260430/A26-release-20260430
 OUT=/workspace/output
 KREL=6.6.89-rk3128+
 
+echo "=== [preflight] Required inputs ==="
+mkdir -p "$OUT" "$VOL" /workspace/work   # work/ is gitignored: absent in a fresh clone
+if [ ! -f "$SRC/Makefile" ]; then
+  echo "FATAL: kernel source not found at $SRC" >&2
+  echo "  clone the published branch (Linux/WSL - see docs/BUILD.md):" >&2
+  echo "  git clone -b kernel-source https://github.com/realldz/rk3128-xmio-armbian $SRC" >&2
+  exit 1
+fi
+if [ ! -f /workspace/tools/toolchain/gcc-arm-10.3.tar.xz ]; then
+  echo "FATAL: cross toolchain tarball missing: tools/toolchain/gcc-arm-10.3.tar.xz" >&2
+  echo "  download gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf (see docs/BUILD.md)" >&2
+  exit 1
+fi
+
 echo "=== [0/6] Toolchain + build script ==="
 if [ ! -x "$VOL/toolchain/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf/bin/arm-none-linux-gnueabihf-gcc" ]; then
   mkdir -p "$VOL/toolchain"
@@ -83,8 +97,13 @@ for f in "$VOL/kernel-out"/overlay/*.dtbo; do cp -f "$f" "$OUT/dtb/overlay/"; do
 KIMG=$(find "$VOL/kernel-out/final" -name 'linux-image-6.6.89-rk3128+_*.deb' | head -1)
 dpkg-deb -x "$KIMG" /tmp/kimg
 cp -f /tmp/kimg/boot/dtb/rk3128-xmio.dtb "$OUT/dtb/"
-cp -f "$A26/parameter.txt" "$A26/uboot.img" "$A26/trust.img" \
-      "$A26/rk3128_loader_v2.12.263.bin" "$OUT/nand-flash/"
+if [ -d "$A26" ]; then
+  cp -f "$A26/parameter.txt" "$A26/uboot.img" "$A26/trust.img" \
+        "$A26/rk3128_loader_v2.12.263.bin" "$OUT/nand-flash/"
+else
+  echo "[warn] upstream A26 release tree not found ($A26) - keeping the"
+  echo "       committed output/nand-flash/ copies (local-only tree, see docs/BUILD.md)."
+fi
 ( cd "$OUT" && sha256sum armbian_rootfs_26.2_xmio.img xmio-sd-2g.img debs/*.deb \
     dtb/rk3128-xmio.dtb dtb/rk3128-linux.dtb dtb/overlay/*.dtbo kernel/zImage \
     nand-flash/* > SHA256SUMS.txt )

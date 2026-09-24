@@ -42,7 +42,9 @@ the usrmerge state and `/sbin/init` chain of an ext4 rootfs image. See
 - `patches/` — the 27 kernel/DTS patch scripts (v9 → v28), applied in version
   order; each one documents its target files in its header.
 - `archive/` — one-shot investigation/diagnostic scripts from the research log
-  (NOTES.md). Kept for reference; not part of the pipeline.
+  (NOTES.md). Kept for reference; not part of the pipeline. They are historical
+  snapshots: most assume the author's layout (`/workspace/work/` already exists,
+  the A26 release tree present) and are not runnable as-is on a fresh clone.
 - `boot-patch/` — patched `boot.cmd`/`boot.scr` with the `xmio_fdt_override`
   recovery hook.
 - `rkflashtool-src/` — vendored rkflashtool sources, pinned to upstream

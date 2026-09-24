@@ -67,8 +67,15 @@ output/               final artifacts (checksums in SHA256SUMS.txt)
   kernel/             zImage + kernel.config
   debs/               linux-image / headers / libc-dev 6.6.89-rk3128-2
   nand-flash/         loader, uboot.img, trust.img, parameter.txt
+  planb-uboot-v1..v5/ archived custom-U-Boot experiments (superseded, see NOTES §Z.20–Z.26)
 NOTES.md              full research journal (sections §1–§101)
 ```
+
+Everything else on the author's machine is a **local-only working copy**
+(gitignored, not published): `work/` (scratch + build logs),
+`repos/linux-kernel-6.6-rk3128-tvbox/` (the kernel checkout),
+`A26-release-20260430/` (upstream A26 build + RKDevTool),
+`stock-firmware/`, `output/archive/` and `tools/toolchain/`.
 
 ### Sources
 
