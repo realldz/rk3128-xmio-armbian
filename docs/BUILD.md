@@ -166,10 +166,20 @@ patches applied (see [RKAF-FORMAT.md](RKAF-FORMAT.md) for the format and why):
 ## 6. Verification
 
 ```bash
-python3 tools/rkfw-verify.py update_armbian_v28-v232.img   # header + md5 trailer + extract
-python3 tools/rkaf-parts.py update_armbian_v28-v232.img    # part table dump
-sha256sum -c output/planb-stock-uboot/SHA256SUMS.txt
+# from the repository root
+python3 tools/rkfw-verify.py output/planb-stock-uboot/update_armbian_v28-v232.img   # header + md5 trailer + extract
+python3 tools/rkaf-parts.py  output/planb-stock-uboot/update_armbian_v28-v232.img   # part table dump
+
+sha256sum -c output/SHA256SUMS.txt                            # repo-root-relative, all deliverables
+(cd output/planb-stock-uboot && sha256sum -c SHA256SUMS.txt)  # production flashables only (dir-relative)
+bash tools/acceptance.sh                                      # the whole 30-check suite
 ```
+
+The first manifest lists paths relative to the repository root and includes the
+release assets (`update_armbian_v28-v232.img`, `armbian_rootfs_v23.2_xmio.img`,
+`XMIO-bundle.tar.gz`) — those three lines only verify after you download them from
+the GitHub release; everything committed must verify clean. `tools/rebuild-all.sh`
+regenerates the manifest in the same repo-root-relative form.
 
 Cross-checks worth doing after a rebuild: loader bytes identical to stock
 (`28ea9019…`), every extracted component md5 equals its source, parameter

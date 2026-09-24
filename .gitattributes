@@ -15,6 +15,16 @@
 # PowerShell helpers are used from Windows only.
 /tools/*.ps1    text eol=crlf
 
+# Checksum manifests are fed to sha256sum/Get-FileHash: a stray CR there breaks
+# every line ("file\r" not found). Keep them LF everywhere.
+/output/SHA256SUMS.txt                   text eol=lf
+/output/planb-stock-uboot/SHA256SUMS.txt text eol=lf
+
+# The NAND parameter table must stay byte-identical to the stock A26 file (it is
+# checksummed that way in output/SHA256SUMS.txt and flashed at 0x0). That file is
+# CRLF, so mark it -text: never convert it.
+/output/nand-flash/parameter.txt         -text
+
 # Binary artifacts must never be normalised.
 *.img   binary
 *.bin   binary

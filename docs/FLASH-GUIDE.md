@@ -116,10 +116,10 @@ setenv xmio_overrides "usb-otg-host uart1 dmc-disabled"; boot   # force a differ
 
 `output/SHA256SUMS.txt` holds the checksums of every deliverable. On Windows:
 `Get-FileHash -Algorithm SHA256 <file>` to compare (the `nand-flash/*` files must be
-byte-identical to the original A26 — verified at build time). The two release-asset
-lines (`armbian_rootfs_v23.2_xmio.img`, `planb-stock-uboot/update_armbian_v28-v232.img`)
-only verify once you have downloaded those files from the GitHub release — they are
-not stored in git.
+byte-identical to the original A26 — verified at build time). The three release-asset
+lines (`armbian_rootfs_v23.2_xmio.img`, `planb-stock-uboot/update_armbian_v28-v232.img`,
+`XMIO-bundle.tar.gz`) only verify once you have downloaded those files from the GitHub
+release — they are not stored in git.
 
 ## H. Recovery / rollback (the safe way back)
 

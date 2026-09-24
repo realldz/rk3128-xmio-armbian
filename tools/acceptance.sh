@@ -10,9 +10,28 @@ ok()  { echo "PASS: $1"; }
 bad() { echo "FAIL: $1"; FAIL=1; }
 
 echo "########## 1. Checksums ##########"
+# output/SHA256SUMS.txt lists repo-root-relative paths. Verify it line by line so
+# that (a) a CRLF checkout cannot silently invalidate every entry (`sha256sum -c`
+# then looks for "file\r" and reports nothing) and (b) the three release assets -
+# downloaded, not committed - are counted separately from real mismatches.
+cd /workspace
+CSV_OK=0; CSV_BAD=0; CSV_MISSING=0
+while IFS= read -r hashline; do
+  [ -n "$hashline" ] || continue
+  hash=${hashline%%  *}
+  file=${hashline#*  }
+  file=${file%$'\r'}
+  if [ ! -e "$file" ]; then CSV_MISSING=$((CSV_MISSING+1)); continue; fi
+  actual=$(sha256sum "$file" | cut -d' ' -f1)
+  if [ "$actual" = "$hash" ]; then
+    CSV_OK=$((CSV_OK+1))
+  else
+    CSV_BAD=$((CSV_BAD+1)); echo "MISMATCH: $file"
+  fi
+done < output/SHA256SUMS.txt
+[ "$CSV_BAD" = "0" ] && ok "SHA256SUMS: $CSV_OK files match ($CSV_MISSING release assets not downloaded)" \
+                     || bad "SHA256SUMS: $CSV_BAD mismatched ($CSV_OK ok, $CSV_MISSING absent)"
 cd /workspace/output
-N=$(sha256sum -c SHA256SUMS.txt 2>/dev/null | grep -c ': OK')
-[ "$N" = "31" ] && ok "SHA256SUMS 31/31 OK" || bad "SHA256SUMS only $N/31"
 
 echo "########## 2. Bundles ##########"
 [ -f XMIO-bundle.tar.gz ] && ok "bundle exists" || bad "bundle missing"

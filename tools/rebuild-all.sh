@@ -104,9 +104,11 @@ else
   echo "[warn] upstream A26 release tree not found ($A26) - keeping the"
   echo "       committed output/nand-flash/ copies (local-only tree, see docs/BUILD.md)."
 fi
-( cd "$OUT" && sha256sum armbian_rootfs_26.2_xmio.img xmio-sd-2g.img debs/*.deb \
-    dtb/rk3128-xmio.dtb dtb/rk3128-linux.dtb dtb/overlay/*.dtbo kernel/zImage \
-    nand-flash/* > SHA256SUMS.txt )
+# Repo-root-relative paths, matching the committed manifest (and what
+# tools/acceptance.sh verifies); the product files live under $OUT.
+( cd /workspace && sha256sum output/armbian_rootfs_26.2_xmio.img output/xmio-sd-2g.img \
+    output/debs/*.deb output/dtb/rk3128-xmio.dtb output/dtb/rk3128-linux.dtb \
+    output/dtb/overlay/*.dtbo output/kernel/zImage output/nand-flash/* > output/SHA256SUMS.txt )
 
 echo "=== REBUILD_ALL_DONE ==="
 ls -la "$OUT"
